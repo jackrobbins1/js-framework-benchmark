@@ -1,0 +1,31 @@
+{
+  "name": "js-framework-benchmark-lit-element",
+  "version": "1.1.0",
+  "description": "lit-element demo",
+  "main": "index.js",
+  "js-framework-benchmark": {
+    "frameworkVersionFromPackage": "atomico",
+    "useShadowRoot": false
+  },
+  "scripts": {
+    "build-dev": "exports src/main.jsx --watch",
+    "build-prod": "exports src/main.jsx --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krausest/js-framework-benchmark.git"
+  },
+  "keywords": [
+    "atomico"
+  ],
+  "author": "Matias Trujillo",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/krausest/js-framework-benchmark/issues"
+  },
+  "homepage": "https://github.com/krausest/js-framework-benchmark#readme",
+  "devDependencies": {
+    "@atomico/exports": "latest",
+    "@atomico/tsconfig": "1.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { createStore } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
 
@@ -52,9 +52,11 @@ const store = createStore((state = { data: [], selected: 0 }, action) => {
       return { data: [], selected: 0 };
     case "SWAP_ROWS": {
       const newData = data.slice();
-      const tmp = newData[1];
-      newData[1] = newData[998];
-      newData[998] = tmp;
+      if (data.length>998) {
+        const tmp = newData[1];
+        newData[1] = newData[998];
+        newData[998] = tmp;
+      }
       return { data: newData, selected };
     }
   }
@@ -118,4 +120,7 @@ const Main = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById("main")).render(<Provider store={store}><Main /></Provider>);
+createRoot(document.getElementById("main")).render(
+  <Provider store={store}>
+    <Main />
+  </Provider>);

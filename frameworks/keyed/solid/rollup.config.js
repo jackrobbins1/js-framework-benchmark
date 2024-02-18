@@ -1,6 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve";
-import babel from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
+import { babel } from "@rollup/plugin-babel";
+import terser from "@rollup/plugin-terser";
 
 const plugins = [
   babel({
@@ -12,7 +12,7 @@ const plugins = [
 ];
 
 if (process.env.production) {
-  plugins.push(terser({ output: { comments: false } }));
+  plugins.push(terser());
 }
 
 export default {

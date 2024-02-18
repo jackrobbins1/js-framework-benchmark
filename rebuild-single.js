@@ -1,23 +1,11 @@
-var _ = require('lodash');
-var exec = require('child_process').execSync;
-var fs = require('fs');
-var path = require('path');
-var yargs = require('yargs');
-const rimraf = require('rimraf');
-
-let args = process.argv.length <= 2 ? [] : process.argv.slice(2, process.argv.length);
-
-// Use npm ci or npm install ?
-let ci = args.includes("--ci");
-// Copy package-lock back for docker build or build locally?
-let docker = args.includes("--docker");
-
-let frameworks = args.filter(a => !a.startsWith("--"));
-
-console.log("args", args, "ci", ci, "docker", docker, "frameworks", frameworks);
+import { rebuildCheckSingle } from "./cli/rebuild-check-single.js";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { rebuildFrameworks } from "./cli/rebuild-build-single.js";
+import esMain from "es-main";
 
 /*
-rebuild-single.js [--ci] [--docker] [keyed/framework1 ... non-keyed/frameworkN]
+rebuild-single.js [--ci] [keyed/framework1 ... non-keyed/frameworkN]
 
 This script rebuilds a single framework
 By default it rebuilds from scratch, deletes all package.json and package-lock.json files
@@ -29,34 +17,40 @@ it calls npm ci and npm run build-prod for the benchmark
 Pass list of frameworks
 */
 
-try {
+/**
+ * @param {string[]} frameworks
+ * @param {boolean} useCi
+ */
+function rebuildSingle(frameworks, useCi) {
+  console.log("rebuild-single.js: ci", useCi, "frameworks", frameworks);
+
+  const frameworkNames = frameworks.join(" ");
+
+  try {
     if (frameworks.length == 0) {
-        console.log("ERROR: Missing arguments. Command: docker-rebuild keyed/framework1 non-keyed/framework2 ...");
-        process.exit(1);
+      console.log("ERROR: Missing arguments. Command: rebuild-single keyed/framework1 non-keyed/framework2 ...");
+      process.exit(1);
     }
 
-    if (docker) {
-        let build_cmd = `docker exec -it js-framework-benchmark cp /src/rebuild-build-single.js /build/ && docker exec -it js-framework-benchmark node rebuild-build-single.js ${args.join(" ")}`;
-        console.log(build_cmd);
-        exec(build_cmd,
-            {
-                stdio: 'inherit'
-            });        
-    } else {
-        let build_cmd = `node rebuild-build-single.js ${args.join(" ")}`;
-        console.log(build_cmd);
-        exec(build_cmd,
-            {
-                stdio: 'inherit'
-            });    
-    }
+    rebuildFrameworks(frameworks, useCi);
 
-    let check_cmd = `node rebuild-check-single.js ${args.join(" ")}`;
-    console.log(check_cmd);
-    exec(check_cmd,
-    {
-        stdio: 'inherit'
-    });        
-} catch (e) {
-    console.log(`ERROR: Rebuilding  ${args.join(" ")} was not successful`);
+    rebuildCheckSingle(frameworks);
+  } catch (e) {
+    console.log(`ERROR: Rebuilding  ${frameworkNames} was not successful`);
+  }
+}
+
+if (esMain(import.meta)) {
+  const args = yargs(hideBin(process.argv))
+    .usage("$0 [--ci  keyed/framework1 ... non-keyed/frameworkN]")
+    .boolean("ci")
+    .default("ci", false)
+    .describe("ci", "Use npm ci or npm install ?")
+    .parseSync();
+
+  const useCi = args.ci;
+  const frameworks = args._.filter((arg) => !arg.startsWith("--"));
+
+  console.log("args", args);
+  rebuildSingle(frameworks, useCi);
 }

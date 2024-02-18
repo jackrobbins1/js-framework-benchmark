@@ -5,10 +5,11 @@
   "main": "index.js",
   "js-framework-benchmark": {
     "frameworkVersion": "",
+    "frameworkHomeURL": "",
     "issues": [772]
   },
   "scripts": {
-    "build-dev": "echo 0",
+    "dev": "echo 0",
     "build-prod": "echo 0"
   },
   "keywords": [],

@@ -3,18 +3,17 @@
   "version": "1.0.0",
   "js-framework-benchmark": {
     "frameworkVersionFromPackage": "karyon",
+    "frameworkHomeURL": "https://karyon.dev",
     "issues": [801]
   },
   "dependencies": {
-    "karyon": "1.0.10"
+    "karyon": "^2.0.0"
   },
   "devDependencies": {
-    "rollup": "2.70.2",
-    "rollup-plugin-terser": "7.0.2",
-    "@rollup/plugin-node-resolve": "13.2.1"
+    "esbuild": "^0.19.7"
   },
   "scripts": {
-    "build-dev": "rollup -c",
-    "build-prod": "rollup -c --environment production"
+    "dev":"esbuild src/app.js --outfile=dist/app.js --bundle --watch",
+    "build-prod": "esbuild src/app.js --outfile=dist/app.js --bundle --minify"
   }
 }

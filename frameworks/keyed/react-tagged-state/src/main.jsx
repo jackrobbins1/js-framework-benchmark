@@ -1,6 +1,8 @@
-import {memo, useCallback} from "react";
+import {memo} from 'react';
 import {createRoot} from 'react-dom/client';
-import {createSignal, useSelector, useSignal} from "react-tagged-state";
+import {createSignal, useSelector} from "react-tagged-state";
+
+const random = (max) => Math.round(Math.random() * 1000) % max;
 
 const A = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean",
     "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive",
@@ -9,57 +11,53 @@ const C = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown",
 const N = ["table", "chair", "house", "bbq", "desk", "car", "pony", "cookie", "sandwich", "burger", "pizza", "mouse",
     "keyboard"];
 
-const random = (max) => Math.round(Math.random() * 1000) % max;
-
 let nextId = 1;
 
 const buildData = (count) => {
-    const res = new Array(count);
+    const data = new Array(count);
 
-    for (let index = 0; index < count; index++) {
-        res[index] = {
+    for (let i = 0; i < count; i++) {
+        data[i] = {
             id: nextId++,
-            label: `${A[random(A.length)]} ${C[random(C.length)]} ${N[random(N.length)]}`
+            label: `${A[random(A.length)]} ${C[random(C.length)]} ${N[random(N.length)]}`,
         };
     }
 
-    return res;
-}
+    return data;
+};
 
 const data = createSignal([]);
 
-let selected = createSignal(0);
+const selected = createSignal(0);
 
 const Row = memo(({item}) => {
-    const isSelected = useSelector(() => item.id === selected());
-    const handleSelect = useCallback(() => {
-        selected(item.id);
-    }, [item.id]);
-    const handleRemove = useCallback(() => {
-        data((curr) => curr.filter(({id}) => id !== item.id));
-    }, [item.id]);
+    const isSelected = useSelector(selected, (curr) => curr === item.id);
 
-    return (
-        <tr className={isSelected ? "danger" : ""}>
-            <td className="col-md-1">{item.id}</td>
-            <td className="col-md-4">
-                <a onClick={handleSelect}>{item.label}</a>
-            </td>
-            <td className="col-md-1">
-                <a onClick={handleRemove}><span className="glyphicon glyphicon-remove" aria-hidden="true"/></a>
-            </td>
-            <td className="col-md-6"/>
-        </tr>
-    )
-});
+    return <tr className={isSelected ? "danger" : ""}>
+        <td className="col-md-1">{item.id}</td>
+        <td className="col-md-4">
+            <a onClick={() => selected(item.id)}>{item.label}</a>
+        </td>
+        <td className="col-md-1">
+            <a onClick={() => data((curr) => {
+                const idx = curr.findIndex((d) => d.id === item.id);
 
-const RowList = () => {
-    const items = useSignal(data);
+                return [...curr.slice(0, idx), ...curr.slice(idx + 1)];
+            })}>
+                <span className="glyphicon glyphicon-remove" aria-hidden="true"/>
+            </a>
+        </td>
+        <td className="col-md-6"/>
+    </tr>
+})
 
-    return items.map((item) => <Row key={item.id} item={item}/>)
-};
+const Rows = () => {
+    const items = useSelector(data);
 
-const Button = ({id, title, cb}) => (
+    return items.map(item => (<Row key={item.id} item={item}/>));
+}
+
+const Button = ({id, cb, title}) => (
     <div className="col-sm-6 smallpad">
         <button type="button" className="btn btn-primary btn-block" id={id} onClick={cb}>{title}</button>
     </div>
@@ -69,7 +67,9 @@ const Main = () => (
     <div className="container">
         <div className="jumbotron">
             <div className="row">
-                <div className="col-md-6"><h1>React Tagged State </h1></div>
+                <div className="col-md-6">
+                    <h1>React Tagged State keyed</h1>
+                </div>
                 <div className="col-md-6">
                     <div className="row">
                         <Button id="run" title="Create 1,000 rows" cb={() => {
@@ -80,40 +80,44 @@ const Main = () => (
                             data(buildData(10000));
                             selected(0);
                         }}/>
-                        <Button id="add" title="Append 1,000 rows" cb={() => {
-                            data((curr) => curr.concat(buildData(1000)));
-                        }}/>
-                        <Button id="update" title="Update every 10th row" cb={() => {
-                            data((curr) => {
-                                const copy = curr.slice(0);
+                        <Button id="add" title="Append 1,000 rows"
+                                cb={() => data((curr) => curr.concat(buildData(1000)))}/>
+                        <Button id="update" title="Update every 10th row" cb={() => data((curr) => {
+                            const newData = curr.slice(0);
 
-                                for (let index = 0; index < copy.length; index += 10) {
-                                    const item = copy[index];
+                            for (let i = 0; i < newData.length; i += 10) {
+                                const r = newData[i];
 
-                                    copy[index] = {id: item.id, label: item.label + " !!!"};
-                                }
+                                newData[i] = {id: r.id, label: r.label + " !!!"};
+                            }
 
-                                return copy;
-                            });
-                        }}/>
+                            return newData;
+                        })}/>
                         <Button id="clear" title="Clear" cb={() => {
                             data([]);
                             selected(0);
                         }}/>
-                        <Button id="swaprows" title="Swap Rows" cb={() => {
-                            data((curr) => [curr[0], curr[998], ...curr.slice(2, 998), curr[1], curr[999]]);
-                        }}/>
+                        <Button id="swaprows" title="Swap Rows"
+                                cb={() => data((cur) => {
+                                    const newData = cur.slice();
+                                    if (cur.length>998) {
+                                      const tmp = newData[1];
+                                      newData[1] = newData[998];
+                                      newData[998] = tmp;
+                                    }
+                                    return newData;
+                                })}/>
                     </div>
                 </div>
             </div>
         </div>
         <table className="table table-hover table-striped test-data">
             <tbody>
-            <RowList/>
+            <Rows/>
             </tbody>
         </table>
         <span className="preloadicon glyphicon glyphicon-remove" aria-hidden="true"/>
     </div>
-);
+)
 
 createRoot(document.getElementById("main")).render(<Main/>);

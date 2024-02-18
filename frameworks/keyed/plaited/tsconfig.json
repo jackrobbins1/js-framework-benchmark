@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "NodeNext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "plaited",
+    "moduleResolution": "nodenext",
+		"lib": ["dom", "es2022"]
+	}
+}

@@ -1,5 +1,5 @@
 import React, { useReducer } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import { createContainer, memo } from "react-tracked";
 
 const A = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean",
@@ -51,9 +51,11 @@ const reducer = (state, action) => {
       return { data: [], selected: 0 };
     case "SWAP_ROWS": {
       const newData = data.slice();
-      const tmp = newData[1];
-      newData[1] = newData[998];
-      newData[998] = tmp;
+      if (data.length>998) {
+        const tmp = newData[1];
+        newData[1] = newData[998];
+        newData[998] = tmp;
+      }
       return { data: newData, selected };
     }
   }
@@ -111,7 +113,5 @@ const Main = () => {
   );
 };
 
-ReactDOM.render(
-  <Provider><Main /></Provider>,
-  document.getElementById("main")
-);
+createRoot(document.getElementById("main")).render(<Provider><Main /></Provider>);
+

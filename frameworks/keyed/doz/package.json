@@ -4,12 +4,16 @@
   "description": "Doz demo",
   "main": "index.js",
   "js-framework-benchmark": {
-    "frameworkVersionFromPackage": "doz",
-    "issues": [800]
+    "frameworkVersion": "5-preview",
+    "frameworkHomeURL": "https://github.com/dozjs/doz",
+    "issues": [
+      800,
+      1139
+    ]
   },
   "scripts": {
-    "build-dev": "webpack --watch --mode=development",
-    "build-prod": "webpack --mode=production"
+    "dev": "esbuild src/index.js --outfile=dist/main.js --bundle --watch",
+    "build-prod": "esbuild src/index.js --outfile=dist/main.js --bundle --minify"
   },
   "repository": {
     "type": "git",
@@ -25,10 +29,9 @@
   },
   "homepage": "https://github.com/krausest/js-framework-benchmark#readme",
   "dependencies": {
-    "doz": "3.4.1"
+    "doz": "dozjs/doz#v5"
   },
   "devDependencies": {
-    "webpack": "4.41.4",
-    "webpack-cli": "3.3.10"
+    "esbuild": "^0.18.12"
   }
 }

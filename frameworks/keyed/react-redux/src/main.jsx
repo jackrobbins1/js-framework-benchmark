@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { createStore } from 'redux';
 import { Provider, connect } from 'react-redux';
 
@@ -48,8 +48,15 @@ const store = createStore((state = { data: [], selected: 0 }, action) => {
     case 'CLEAR':
       return { data: [], selected: 0 };
     case 'SWAP_ROWS':
-      return { data: [data[0], data[998], ...data.slice(2, 998), data[1], data[999]], selected };
-  }
+      const newdata = [...data];
+      if (data.length > 998) {
+        const d1 = newdata[1];
+        const d998 = newdata[998];
+        newdata[1] = d998;
+        newdata[998] = d1;
+      }
+      return { data: newdata, selected };
+    }
   return state;
 });
 
@@ -142,11 +149,7 @@ const Main = connect(
   </div>
 ));
 
-ReactDOM.render(
-  (
-    <Provider store={store}>
-      <Main />
-    </Provider>
-  ),
-  document.getElementById("main")
-);
+createRoot(document.getElementById("main")).render(
+<Provider store={store}>
+  <Main />
+</Provider>);

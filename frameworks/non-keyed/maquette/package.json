@@ -4,10 +4,11 @@
   "description": "Benchmark for maquette framework (keyed)",
   "js-framework-benchmark": {
     "frameworkVersionFromPackage": "maquette",
+    "frameworkHomeURL": "https://maquettejs.org/",
     "issues": []
   },
   "scripts": {
-    "build-dev": "node build.js",
+    "dev": "node build.js",
     "build-prod": "node build.js"
   },
   "devDependencies": {

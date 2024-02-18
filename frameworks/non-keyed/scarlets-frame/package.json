@@ -5,10 +5,11 @@
   "main": "src/index.js",
   "js-framework-benchmark": {
     "frameworkVersionFromPackage": "scarletsframe",
-    "issues": [800]
+    "frameworkHomeURL": "https://github.com/ScarletsFiction/ScarletsFrame",
+    "issues": [800, 1139]
   },
   "scripts": {
-    "build-dev": "rollup -c -w",
+    "dev": "rollup -c -w",
     "build-prod": "rollup -c --environment production"
   },
   "keywords": [

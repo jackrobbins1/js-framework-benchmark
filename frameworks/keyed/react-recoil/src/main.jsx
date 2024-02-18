@@ -6,7 +6,7 @@ import {
   useSetRecoilState,
   useRecoilValue,
 } from "recoil";
-import { render } from "react-dom";
+import { createRoot } from 'react-dom/client';
 
 const random = (max) => Math.round(Math.random() * 1000) % max;
 
@@ -25,9 +25,8 @@ const buildData = (count) => {
   for (let i = 0; i < count; i++) {
     data[i] = {
       id: nextId++,
-      label: `${A[random(A.length)]} ${C[random(C.length)]} ${
-        N[random(N.length)]
-      }`,
+      label: `${A[random(A.length)]} ${C[random(C.length)]} ${N[random(N.length)]
+        }`,
     };
   }
 
@@ -135,19 +134,16 @@ const Jumbotron = memo(
     ]);
 
     const swapRows = useCallback(() => {
-      setAppState(({ data, selected }) =>
-        data.length > 998
-          ? {
-              data: [
-                data[0],
-                data[998],
-                ...data.slice(2, 998),
-                data[1],
-                data[999],
-              ],
-              selected,
-            }
-          : state
+      setAppState(({ data, selected }) => {
+        const newdata = [...data];
+        if (data.length > 998) {
+          const d1 = newdata[1];
+          const d998 = newdata[998];
+          newdata[1] = d998;
+          newdata[998] = d1;
+        }
+        return { data: newdata, selected };
+      }
       );
     }, [setAppState]);
 
@@ -203,9 +199,9 @@ const Main = () => {
   );
 };
 
-render(
+const root = createRoot(document.getElementById('main'));
+root.render(
   <RecoilRoot>
     <Main />
-  </RecoilRoot>,
-  document.getElementById("main")
-);
+  </RecoilRoot>
+); 
